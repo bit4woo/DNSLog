@@ -153,4 +153,4 @@ def api(request, logtype, udomain, hashstr):
                 content.append(e.path)
     else:
         return HttpResponseRedirect('/')
-    return render(request, 'api.html', {'content':content})
+    return render(request, 'api.html', {'content':",".join(content)})
