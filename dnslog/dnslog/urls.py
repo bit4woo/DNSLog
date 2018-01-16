@@ -18,7 +18,7 @@ from django.contrib import admin
 from logview import views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin', include(admin.site.urls)),
     url(r'^logout/', views.my_logout, name='logout'),
     url(r'^api/(.+?)/(.+?)/(.+?)/$', views.api, name='api'),
     url(r'^.*$', views.index, name='index'),

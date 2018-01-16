@@ -2,6 +2,7 @@
 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
+from django.forms.models import model_to_dict
 from django.template import RequestContext
 from django.core.paginator import (
     Paginator, InvalidPage, EmptyPage, PageNotAnInteger)
@@ -138,16 +139,18 @@ def logview(request, userid):
 
 
 def api(request, logtype, udomain, hashstr):
-    apistatus = False
+    content = []
     host = "%s.%s." % (hashstr, udomain)
     if logtype == 'dns':
         res = DNSLog.objects.filter(host__contains=host)
         if len(res) > 0:
-            apistatus = True
+            for e in res:
+                content.append(e.host)
     elif logtype == 'web':
         res = WebLog.objects.filter(path__contains=host)
         if len(res) > 0:
-            apistatus = True
+            for e in res:
+                content.append(e.path)
     else:
         return HttpResponseRedirect('/')
-    return render(request, 'api.html', {'apistatus': apistatus})
+    return render(request, 'api.html', {'content':content})
