@@ -10,6 +10,8 @@ from models import *
 from dnslog import settings
 from django.contrib.auth import logout
 import json
+import hashlib
+import time
 
 
 def index(request):
@@ -63,6 +65,8 @@ def login(request):
                 username__exact=username, password__exact=password)
             if user:
                 request.session['userid'] = user[0].id
+                token = hashlib.md5(username+password+str(time.time())).hexdigest()
+                User.objects.filter(username__exact=username).update(token=token)
                 return logview(request, user[0].id)
             else:
                 return render(
@@ -138,18 +142,43 @@ def logview(request, userid):
     return render_to_response('views.html', vardict)
 
 
-def api(request, logtype, udomain, hashstr):
+def xxxxapilogin(request):
+    if request.method =="POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = User.objects.filter(
+            username__exact=username, password__exact=password)
+        if user:
+            request.session['userid'] = user[0].id
+            token = hashlib.md5(username + password + str(time.time())).hexdigest()
+            User.objects.filter(username__exact=username).update(token=token)
+            resp = {'token': token}
+            return HttpResponse(json.dumps(resp), content_type="application/json")
+
+def apilogin(request,username,password):#http://127.0.0.1:8000/apilogin/test/123456/
+    #resp = {'token': "token"}
+    #return HttpResponse(json.dumps(resp), content_type="application/json")
+    user = User.objects.filter(
+        username__exact=username, password__exact=password)
+    if user:
+        request.session['userid'] = user[0].id
+        token = hashlib.md5(username + password + str(time.time())).hexdigest()
+        User.objects.filter(username__exact=username).update(token=token)
+        resp = {'token': token}
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+def apiquery(request,logtype,subdomain,token):#http://127.0.0.1:8000/apiquery/dns/test/a2f78f403d7b8b92ca3486bb4dc0e498/
     apistatus = False
     content = []
-    host = "%s.%s." % (hashstr, udomain)
-    if logtype == 'dns':
-        res = DNSLog.objects.filter(host__contains=host)
+    user = User.objects.filter(token__exact=token)
+    if user and logtype == 'dns':
+        res = DNSLog.objects.filter(host__contains=subdomain)
         if len(res) > 0:
             apistatus = True
             for e in res:
                 content.append(e.host)
-    elif logtype == 'web':
-        res = WebLog.objects.filter(path__contains=host)
+    elif user and logtype == 'web':
+        res = WebLog.objects.filter(path__contains=subdomain)
         if len(res) > 0:
             apistatus = True
             for e in res:
@@ -158,5 +187,23 @@ def api(request, logtype, udomain, hashstr):
         return HttpResponseRedirect('/')
     #return render(request, 'api.html', {'content':",".join(content)})
     #不调用模板，直接返回数据
-    resp = {'stutas': apistatus, 'content': ",".join(content)}
+    resp = {'status': apistatus, 'content': ",".join(content)}
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+def apidel(request,logtype,subdomain,token):#http://127.0.0.1:8000/apidel/dns/test/a2f78f403d7b8b92ca3486bb4dc0e498/
+    user = User.objects.filter(token__exact=token)
+    apistatus = False #del success or not
+    if user and logtype == 'dns':
+        DNSLog.objects.filter(user=user,host__contains=subdomain).delete()
+        res = DNSLog.objects.filter(host__contains=subdomain)
+        if len(res) == 0:
+            apistatus = True
+    elif user and logtype == 'web':
+        WebLog.objects.filter(user=user,host__contains=subdomain).delete()
+        res = WebLog.objects.filter(path__contains=subdomain)
+        if len(res) == 0:
+            apistatus = True
+    else:
+        return HttpResponseRedirect('/')
+    resp = {'status': apistatus}
     return HttpResponse(json.dumps(resp), content_type="application/json")

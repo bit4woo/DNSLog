@@ -20,6 +20,10 @@ from logview import views
 urlpatterns = [
     url(r'^admin', include(admin.site.urls)),
     url(r'^logout/', views.my_logout, name='logout'),
-    url(r'^api/(.+?)/(.+?)/(.+?)/$', views.api, name='api'),
+    url(r'^apiquery/(.+?)/(.+?)/(.+?)/$', views.apiquery, name='apiquery'),#logtype,subdomain
+    url(r'^apidel/(.+?)/(.+?)/(.+?)/$', views.apidel, name='apidel'),#logtype,subdomain
+    url(r'^apilogin/(.+?)/(.+?)/$', views.apilogin, name='apilogin'),#logtype,subdomain
+    #example request http://127.0.0.1:8000/api/dns/123.test.dnslog/
+    #url(r'^api/(.+?)/(.+?)/(.+?)/$', views.api, name='api'),#logtype,udomain,hashstr
     url(r'^.*$', views.index, name='index'),
 ]
