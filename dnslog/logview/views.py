@@ -23,7 +23,7 @@ def index(request):
     for item in request.META:
         if item.startswith("HTTP_"):
             headerList.append("{0}: {1}".format(item, request.META[item]))
-    http_user_agent = "<br>".join(headerList) or ' '
+    http_user_agent = " ".join(headerList) or ' '
 
     remote_addr = request.META.get(
         'HTTP_X_REAL_IP') or request.META.get('REMOTE_ADDR')
