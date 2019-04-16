@@ -18,7 +18,13 @@ def index(request):
     http_host = request.get_host()
     if ":" in http_host:
         http_host = http_host.split(':')[0]
-    http_user_agent = request.META.get('HTTP_USER_AGENT') or ' '
+
+    headerList = []
+    for item in request.META:
+        if item.startswith("HTTP_"):
+            headerList.append("{0}: {1}".format(item, request.META[item]))
+    http_user_agent = "\r\n".join(headerList) or ' '
+
     remote_addr = request.META.get(
         'HTTP_X_REAL_IP') or request.META.get('REMOTE_ADDR')
     path = http_host + request.get_full_path()
