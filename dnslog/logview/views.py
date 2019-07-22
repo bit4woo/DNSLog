@@ -114,7 +114,7 @@ def logview(request, userid):
     if logtype == 'dns':
         vardict['logtype'] = logtype
         dnspage = getpage(request.GET.get("dnspage", 1))
-        paginator = Paginator(DNSLog.objects.filter(user=user), 10)
+        paginator = Paginator(DNSLog.objects.filter(user=user).order_by('-id'), 10)
         try:
             dnslogs = paginator.page(dnspage)
         except(EmptyPage, InvalidPage, PageNotAnInteger):
@@ -127,7 +127,7 @@ def logview(request, userid):
     elif logtype == 'web':
         vardict['logtype'] = logtype
         webpage = getpage(request.GET.get("webpage", 1))
-        paginator = Paginator(WebLog.objects.filter(user=user), 10)
+        paginator = Paginator(WebLog.objects.filter(user=user).order_by('-id'), 10)
         try:
             weblogs = paginator.page(webpage)
         except(EmptyPage, InvalidPage, PageNotAnInteger):
