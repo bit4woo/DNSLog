@@ -27,10 +27,10 @@ SECRET_KEY = '#ma=s-l!2obwj%h-6uu^sbw+4%i2w79%v3^ill62k3&7tjf5dc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.0y0.link','.0y0.link.','127.0.0.1']
 
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False #http 跳转https的设置
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = (

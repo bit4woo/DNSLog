@@ -104,12 +104,20 @@ def logview(request, userid):
     vardict = {}
     logtype = request.GET.get("logtype", 'dns')
     deltype = request.GET.get("del")
+    freshToken = request.GET.get("fresh")
     if deltype == 'dns':
         DNSLog.objects.filter(user=user).delete()
         return HttpResponseRedirect('/?logtype=dns')
     if deltype == 'web':
         WebLog.objects.filter(user=user).delete()
         return HttpResponseRedirect('/?logtype=web')
+    if freshToken == True:
+        if user:
+            request.session['userid'] = user[0].id
+            token = hashlib.md5(user.username + user.password + str(time.time())).hexdigest()
+            user.update(token=token)
+        return HttpResponseRedirect('/?logtype=dns')
+
     if logtype == 'dns':
         vardict['logtype'] = logtype
         dnspage = getpage(request.GET.get("dnspage", 1))
@@ -143,6 +151,7 @@ def logview(request, userid):
 
     vardict['udomain'] = str(user.udomain)
     vardict['admindomain'] = str(settings.ADMIN_DOMAIN)
+    vardict['apitoken'] = user.token
 
     return render_to_response('views.html', vardict)
 
@@ -167,10 +176,7 @@ def apilogin(request,username,password):#http://127.0.0.1:8000/apilogin/test/123
         username__exact=username, password__exact=password)
     if user:
         apistatus = True
-
-        request.session['userid'] = user[0].id
-        token = hashlib.md5(username + password + str(time.time())).hexdigest()
-        User.objects.filter(username__exact=username).update(token=token)
+        token = user.token
     else:
         pass
     resp = {'status': apistatus, 'token': token}
@@ -181,15 +187,15 @@ def apiquery(request,logtype,subdomain,token):#http://127.0.0.1:8000/apiquery/dn
     content = []
     user = User.objects.filter(token__exact=token)
     if user and logtype == 'dns':
+        apistatus = True
         res = DNSLog.objects.filter(host__contains=subdomain)
         if len(res) > 0:
-            apistatus = True
             for e in res:
                 content.append(e.host)
     elif user and logtype == 'web':
+        apistatus = True
         res = WebLog.objects.filter(path__contains=subdomain)
         if len(res) > 0:
-            apistatus = True
             for e in res:
                 content.append(e.path)
     else:
