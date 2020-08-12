@@ -228,8 +228,7 @@
 
         <div class="bs" data-example-id="hoverable-table">
 
-<textarea class="form-control" rows="10" disabled>
-    
+<textarea class="form-control" rows="30" disabled>
 你的子域名:{{userdomain}} 
 你的API Token：{{apitoken}}
 
@@ -237,24 +236,24 @@ logtype: 值为dns或者web
 subdomain: 域名字符串,比如rmi.{{userdomain}}中的rmi
 apitoken: 请求接口中的API Token，身份凭证
 
+1、登陆以获取token
 http://{{admindomain}}/apilogin/{username}/{password}/
-#http://{{admindomain}}/apilogin/test/123456/
-#登陆以获取token
+http://{{admindomain}}/apilogin/test/123456/
 接口以JSON格式返回结果：
 {"status": true, "token": "ed691017b35866ab734e44c92c1a066a"}
 {"status": false, "token": ""}
 
-
+2、查询特定域名的某类型记录
 http://{{admindomain}}/apiquery/{logtype}/{subdomain}/{apitoken}/
-#http://{{admindomain}}/apiquery/dns/rmi/{{apitoken}}/
-#查询特定域名的某类型记录
+http://{{admindomain}}/apiquery/dns/rmi/{{apitoken}}/
+接口以JSON格式返回结果：
 {"status": true, "content": "rmiyso.bit.0y0.link.,rmiyso.bit.0y0.link."}
 {"status": false, "content": ""}
 
-
+2、删除特定域名的某类型记录
 http://{{admindomain}}/apidel/{logtype}/{subdomain}/{token}/
-#http://{{admindomain}}/apidel/dns/rmi/{{apitoken}}/
-#删除特定域名的某类型记录
+http://{{admindomain}}/apidel/dns/rmi/{{apitoken}}/
+接口以JSON格式返回结果：
 {"status": true}
 {"status": false}
 
