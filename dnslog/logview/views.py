@@ -161,15 +161,19 @@ def xxxxapilogin(request):
             return HttpResponse(json.dumps(resp), content_type="application/json")
 
 def apilogin(request,username,password):#http://127.0.0.1:8000/apilogin/test/123456/
-    #resp = {'token': "token"}
-    #return HttpResponse(json.dumps(resp), content_type="application/json")
+    apistatus = False
+    token = ""
     user = User.objects.filter(
         username__exact=username, password__exact=password)
     if user:
+        apistatus = True
+
         request.session['userid'] = user[0].id
         token = hashlib.md5(username + password + str(time.time())).hexdigest()
         User.objects.filter(username__exact=username).update(token=token)
-        resp = {'token': token}
+    else:
+        pass
+    resp = {'status': apistatus, 'token': token}
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
 def apiquery(request,logtype,subdomain,token):#http://127.0.0.1:8000/apiquery/dns/test/a2f78f403d7b8b92ca3486bb4dc0e498/
@@ -189,7 +193,8 @@ def apiquery(request,logtype,subdomain,token):#http://127.0.0.1:8000/apiquery/dn
             for e in res:
                 content.append(e.path)
     else:
-        return HttpResponseRedirect('/')
+       pass
+        # return HttpResponseRedirect('/')
     #return render(request, 'api.html', {'content':",".join(content)})
     #不调用模板，直接返回数据
     resp = {'status': apistatus, 'content': ",".join(content)}
@@ -209,6 +214,7 @@ def apidel(request,logtype,subdomain,token):#http://127.0.0.1:8000/apidel/dns/te
         if len(res) == 0:
             apistatus = True
     else:
-        return HttpResponseRedirect('/')
+        pass
+        # return HttpResponseRedirect('/')
     resp = {'status': apistatus}
     return HttpResponse(json.dumps(resp), content_type="application/json")
