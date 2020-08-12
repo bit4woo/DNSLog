@@ -105,18 +105,18 @@ def logview(request, userid):
     logtype = request.GET.get("logtype", 'dns')
     deltype = request.GET.get("del")
     freshToken = request.GET.get("fresh")
+    # print(freshToken)
     if deltype == 'dns':
         DNSLog.objects.filter(user=user).delete()
         return HttpResponseRedirect('/?logtype=dns')
     if deltype == 'web':
         WebLog.objects.filter(user=user).delete()
         return HttpResponseRedirect('/?logtype=web')
-    if freshToken == True:
+    if freshToken:
+        # print(user.username)
         if user:
-            request.session['userid'] = user[0].id
-            token = hashlib.md5(user.username + user.password + str(time.time())).hexdigest()
-            user.update(token=token)
-        return HttpResponseRedirect('/?logtype=dns')
+            newtoken = hashlib.md5(user.username + user.password + str(time.time())).hexdigest()
+            user.token=newtoken
 
     if logtype == 'dns':
         vardict['logtype'] = logtype
@@ -152,7 +152,6 @@ def logview(request, userid):
     vardict['udomain'] = str(user.udomain)
     vardict['admindomain'] = str(settings.ADMIN_DOMAIN)
     vardict['apitoken'] = user.token
-
     return render_to_response('views.html', vardict)
 
 
@@ -176,7 +175,7 @@ def apilogin(request,username,password):#http://127.0.0.1:8000/apilogin/test/123
         username__exact=username, password__exact=password)
     if user:
         apistatus = True
-        token = user.token
+        token = user[0].token
     else:
         pass
     resp = {'status': apistatus, 'token': token}

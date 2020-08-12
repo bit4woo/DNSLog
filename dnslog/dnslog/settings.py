@@ -29,8 +29,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['.0y0.link','.0y0.link.','127.0.0.1']
 
-SECURE_SSL_REDIRECT = False #http 跳转https的设置
-#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = (
@@ -105,11 +103,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # 做dns记录的域名
-DNS_DOMAIN = 'dnslog.link'
+DNS_DOMAIN = '0y0.link'
 
 # 记录管理的域名
 
-ADMIN_DOMAIN = 'admin.dnslog.link'
+ADMIN_DOMAIN = 'admin.0y0.link'
 
 # NS域名
 
