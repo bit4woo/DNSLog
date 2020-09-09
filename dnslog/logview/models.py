@@ -50,7 +50,7 @@ class DNSLog(models.Model):
         ordering = ['log_time']
 
     def str(self):
-        return self.host+"\t"+self.type+"\t"+self.log_time
+        return self.host+"\t"+self.type+"\t"+self.log_time.__str__()
 class DNSLogAdmin(admin.ModelAdmin):
     list_display = ('user', 'host', 'type', 'log_time')
 
