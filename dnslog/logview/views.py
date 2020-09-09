@@ -121,13 +121,16 @@ def logview(request, userid):
 
     if export:
         if user:
+            content = []
             apistatus = True
             result = DNSLog.objects.filter(user=user)
-            result = result+" "+WebLog.objects.filter(user=user)
+            if len(result) > 0:
+                for e in result:
+                    content.append(e.str())
         else:
             pass
 
-        response = HttpResponse(result,content_type='APPLICATION/OCTET-STREAM')  # 设定文件头，这种设定可以让任意文件都能正确下载，而且已知文本文件不是本地打开
+        response = HttpResponse("\r\n".join(content),content_type='APPLICATION/OCTET-STREAM')  # 设定文件头，这种设定可以让任意文件都能正确下载，而且已知文本文件不是本地打开
         response['Content-Disposition'] = 'attachment; filename=dnslog-export.txt'  # 设定传输给客户端的文件名称
         response['Content-Length'] = len(result)  # 传输给客户端的文件大小
 

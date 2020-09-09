@@ -27,6 +27,9 @@ class WebLog(models.Model):
 
     class Meta:
         ordering = ['log_time']
+
+    def str(self):
+        return self.path + "\t" + self.remote_addr + "\t" + self.log_time
 class WebLogAdmin(admin.ModelAdmin):
     list_display = (
         'user', 'path', 'remote_addr', 'http_user_agent', 'log_time')
@@ -46,6 +49,8 @@ class DNSLog(models.Model):
     class Meta:
         ordering = ['log_time']
 
+    def str(self):
+        return self.host+"\t"+self.type+"\t"+self.log_time
 class DNSLogAdmin(admin.ModelAdmin):
     list_display = ('user', 'host', 'type', 'log_time')
 
