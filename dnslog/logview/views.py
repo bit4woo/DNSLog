@@ -121,12 +121,11 @@ def logview(request, userid):
 
     if export:
         if user:
-            content = []
-            apistatus = True
+            content = set()
             result = DNSLog.objects.filter(user=user)
             if len(result) > 0:
                 for e in result:
-                    content.append(e.str())
+                    content.add(e.host)
         else:
             pass
 
