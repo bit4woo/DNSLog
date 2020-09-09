@@ -105,6 +105,7 @@ def logview(request, userid):
     logtype = request.GET.get("logtype", 'dns')
     deltype = request.GET.get("del")
     freshToken = request.GET.get("fresh")
+    export = request.GET.get("export")
     # print(freshToken)
     if deltype == 'dns':
         DNSLog.objects.filter(user=user).delete()
@@ -117,6 +118,20 @@ def logview(request, userid):
         if user:
             newtoken = hashlib.md5(user.username + user.password + str(time.time())).hexdigest()
             user.token=newtoken
+
+    if export:
+        if user:
+            apistatus = True
+            result = DNSLog.objects.filter(user=user)
+            result = result+" "+WebLog.objects.filter(user=user)
+        else:
+            pass
+
+        response = HttpResponse(result,content_type='APPLICATION/OCTET-STREAM')  # 设定文件头，这种设定可以让任意文件都能正确下载，而且已知文本文件不是本地打开
+        response['Content-Disposition'] = 'attachment; filename=dnslog-export.txt'  # 设定传输给客户端的文件名称
+        response['Content-Length'] = len(result)  # 传输给客户端的文件大小
+
+        return response
 
     if logtype == 'dns':
         vardict['logtype'] = logtype
@@ -187,13 +202,13 @@ def apiquery(request,logtype,subdomain,token):#http://127.0.0.1:8000/apiquery/dn
     user = User.objects.filter(token__exact=token)
     if user and logtype == 'dns':
         apistatus = True
-        res = DNSLog.objects.filter(host__contains=subdomain)
+        res = DNSLog.objects.filter(user=user,host__contains=subdomain)
         if len(res) > 0:
             for e in res:
                 content.append(e.host)
     elif user and logtype == 'web':
         apistatus = True
-        res = WebLog.objects.filter(path__contains=subdomain)
+        res = WebLog.objects.filter(user=user,path__contains=subdomain)
         if len(res) > 0:
             for e in res:
                 content.append(e.path)
